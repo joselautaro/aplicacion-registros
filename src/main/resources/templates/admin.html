@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador</title>
+    <!-- Importamos Bootstrap para estilos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Importamos nuestros estilos personalizados -->
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Sistema de Registro</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/usuarios}">Usuarios</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a class="nav-link" th:href="@{/admin}">Panel Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post">
+                            <button class="btn nav-link" type="submit">Cerrar Sesión</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Panel de Administrador</h3>
+                <span sec:authorize="isAuthenticated()" class="text-white">
+                    Bienvenido, <span sec:authentication="name"></span>
+                    <span class="admin-badge">Administrador</span>
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    Esta sección es solo para administradores.
+                </div>
+                
+                <h4 class="mt-4">Gestión de Usuarios</h4>
+                
+                <div th:if="${usuarios.empty}" class="alert alert-info">
+                    No hay usuarios registrados.
+                </div>
+                
+                <div th:if="${!usuarios.empty}">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Usuario</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="usuario : ${usuarios}">
+                                <td th:text="${usuario.id}"></td>
+                                <td th:text="${usuario.nombre}"></td>
+                                <td th:text="${usuario.apellido}"></td>
+                                <td th:text="${usuario.nombreUsuario}"></td>
+                                <td th:text="${usuario.correo}"></td>
+                                <td>
+                                    <span th:if="${usuario.esAdmin}" class="admin-badge">Administrador</span>
+                                    <span th:unless="${usuario.esAdmin}" class="user-badge">Usuario</span>
+                                </td>
+                                <td>
+                                    <form th:if="${!usuario.esAdmin}" th:action="@{/admin/promover}" method="post" style="display: inline;">
+                                        <input type="hidden" name="id" th:value="${usuario.id}" />
+                                        <button type="submit" class="btn btn-sm btn-success">Promover a Admin</button>
+                                    </form>
+                                    <form th:if="${usuario.esAdmin && usuario.id != usuarioActual.id}" th:action="@{/admin/degradar}" method="post" style="display: inline;">
+                                        <input type="hidden" name="id" th:value="${usuario.id}" />
+                                        <button type="submit" class="btn btn-sm btn-warning">Degradar a Usuario</button>
+                                    </form>
+                                    <form th:if="${usuario.id != usuarioActual.id}" th:action="@{/admin/eliminar}" method="post" style="display: inline;">
+                                        <input type="hidden" name="id" th:value="${usuario.id}" />
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este usuario?')">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

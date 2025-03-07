@@ -27,8 +27,8 @@ public class InicializadorDatos implements CommandLineRunner{
     }
 
     private void inicializarRoles(){
-        if(!rolRepositorio.existsByNombre("ROL_USER")){
-            rolRepositorio.save(new Rol("ROL_USER"));
+        if(!rolRepositorio.existsByNombre("ROLE_USER")){
+            rolRepositorio.save(new Rol("ROLE_USER"));
         }
         if(!rolRepositorio.existsByNombre("ROLE_ADMIN")){
             rolRepositorio.save(new Rol("ROLE_ADMIN"));
@@ -39,7 +39,7 @@ public class InicializadorDatos implements CommandLineRunner{
         if(!usuarioRepositorio.existsByNombreUsuario("admin")){
             Collection<Rol> roles = new ArrayList<>();
 
-            Rol rolUsuario = rolRepositorio.findByNombre("ROL_USER")
+            Rol rolUsuario = rolRepositorio.findByNombre("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Rol de usuario no encontrado"));
 
             Rol rolAdmin = rolRepositorio.findByNombre("ROLE_ADMIN")
